@@ -8,6 +8,6 @@ namespace Companyapi.Domain.Entities
 {
     public  class GlobalSettings
     {
-        public string ClientConnection;
+        public string ClientConnection { get; set; }
     }
 }

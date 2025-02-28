@@ -22,7 +22,7 @@ namespace Companyapi.Controllers
         }
 
 
-        [HttpGet("ValidateLogin")]
+        [HttpPost("ValidateLogin")]
         public async Task<IActionResult> Get([FromBody] User user)
         {
             var res = await _companyService.ValidateLogin(user);
@@ -33,7 +33,7 @@ namespace Companyapi.Controllers
         [HttpPost("CreateUser")]
         public async Task<IActionResult> SaveUser([FromBody] User user)
         {
-            var res = await _companyService.ValidateLogin(user);
+            var res = await _companyService.RegisterUser(user);
             return Ok(res);
         }
 
