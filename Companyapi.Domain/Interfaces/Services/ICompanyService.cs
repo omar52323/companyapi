@@ -13,6 +13,6 @@ namespace Companyapi.Domain.Interfaces.Services
 
         Task<bool> RegisterUser(User user);
 
-        Task<bool> RegisterCompany(Company company);
+        Task<Company> RegisterCompany(Company company);
     }
 }

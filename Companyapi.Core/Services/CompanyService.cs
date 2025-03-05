@@ -27,7 +27,7 @@ namespace Companyapi.Core.Services
         {
             return await _dbRepository.RegisterUser(user);
         }
-        public async Task<bool> RegisterCompany(Company company)
+        public async Task<Company> RegisterCompany(Company company)
         {
             return await _dbRepository.RegisterCompany(company);
         }

@@ -111,12 +111,12 @@ namespace Companyapi.Infraestructure.Repositories
         }
 
 
-        public async Task<bool> RegisterCompany(Company Company)
+        public async Task<Company> RegisterCompany(Company Company)
         {
             try
             {
                 var companys = new List<Company>();
-
+                var newCompany = new Company();
                 companys.Add(Company);
                 string Json = JsonConvert.SerializeObject(companys).ToString();
                 using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
@@ -129,7 +129,7 @@ namespace Companyapi.Infraestructure.Repositories
                     cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
                     cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
                     cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
-
+                    cmd.Parameters.Add(new SqlParameter("@Company", SqlDbType.NVarChar, -1) { Direction = ParameterDirection.Output });
                     await con.OpenAsync();
 
                     await cmd.ExecuteNonQueryAsync();
@@ -142,8 +142,9 @@ namespace Companyapi.Infraestructure.Repositories
                     {
                         throw new Exception($"Error error registrando compañia en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
                     }
-
-                    return response;
+                    string CompanyJson = cmd.Parameters["@Company"].Value.ToString();
+                    newCompany = JsonConvert.DeserializeObject<Company>(CompanyJson);
+                    return newCompany;
 
                 }
             }

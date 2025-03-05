@@ -11,7 +11,6 @@ namespace Companyapi.Domain.Interfaces.Repositories
     {
         Task<User> ValidateLogin(UserLogin user);
         Task<bool> RegisterUser(User user);
-
-        Task<bool> RegisterCompany(Company Company);
+        Task<Company> RegisterCompany(Company Company);
     }
 }
