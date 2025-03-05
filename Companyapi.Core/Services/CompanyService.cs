@@ -16,7 +16,7 @@ namespace Companyapi.Core.Services
         {
             _dbRepository = dbRepository;
         }
-        public async Task<bool> ValidateLogin(User user)
+        public async Task<User> ValidateLogin(UserLogin user)
         {
 
             return await _dbRepository.ValidateLogin(user);
@@ -27,7 +27,10 @@ namespace Companyapi.Core.Services
         {
             return await _dbRepository.RegisterUser(user);
         }
-
+        public async Task<bool> RegisterCompany(Company company)
+        {
+            return await _dbRepository.RegisterCompany(company);
+        }
 
     }
 }

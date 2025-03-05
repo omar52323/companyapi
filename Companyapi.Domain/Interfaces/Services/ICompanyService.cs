@@ -9,8 +9,10 @@ namespace Companyapi.Domain.Interfaces.Services
 {
     public interface ICompanyService
     {
-        Task<bool> ValidateLogin(User user);
+        Task<User> ValidateLogin(UserLogin user);
 
         Task<bool> RegisterUser(User user);
+
+        Task<bool> RegisterCompany(Company company);
     }
 }

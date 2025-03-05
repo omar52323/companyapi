@@ -9,7 +9,9 @@ namespace Companyapi.Domain.Interfaces.Repositories
 {
     public interface IDbRepository
     {
-        Task<bool> ValidateLogin(User user);
+        Task<User> ValidateLogin(UserLogin user);
         Task<bool> RegisterUser(User user);
+
+        Task<bool> RegisterCompany(Company Company);
     }
 }

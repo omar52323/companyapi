@@ -20,50 +20,43 @@ namespace Companyapi.Infraestructure.Repositories
         public DbRepository(GlobalSettings settings) {
             _settings = settings;
         }
-        public async Task<bool> ValidateLogin(User user)
+        public async Task<User> ValidateLogin(UserLogin user)
         {
-            
-                try
+            try
+            {
+                string Json = JsonConvert.SerializeObject(user).ToString();
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
                 {
-
-                 var users = new List<User>();
-
-                users.Add(user);
-                string Json = JsonConvert.SerializeObject(users).ToString();
-                    using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                    SqlCommand cmd = new SqlCommand("SP_Validar_Usuario", con)
                     {
-                        SqlCommand cmd = new SqlCommand("SP_Validar_Usuario", con)
-                        {
-                            CommandType = CommandType.StoredProcedure
-                        };
-                        cmd.CommandTimeout = 0;
-                        cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
-                        cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
-                        cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
+                    cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@UserJson", SqlDbType.NVarChar, -1) { Direction = ParameterDirection.Output });
 
-                        await con.OpenAsync();
+                    await con.OpenAsync();
+                    await cmd.ExecuteNonQueryAsync();
 
-                        await cmd.ExecuteNonQueryAsync();
+                    bool response = (bool)cmd.Parameters["@Response"].Value;
 
-                        bool response = true;
-
-                        response = (bool)cmd.Parameters["@Response"].Value;
-
-                        if (!response)
-                        {
-                            throw new Exception($"Error error validando usuario en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
-                        }
-
-                        return response;
-
+                    if (!response)
+                    {
+                        throw new Exception($"Error validando usuario en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
                     }
-                }
-                catch (Exception ex)
-                {
 
-                    throw;
+                    string userJson = cmd.Parameters["@UserJson"].Value.ToString();
+                    var validatedUser = JsonConvert.DeserializeObject<User>(userJson);
+
+                    return validatedUser;
                 }
-            
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
         }
 
         public async Task<bool> RegisterUser(User user)
@@ -96,6 +89,50 @@ namespace Companyapi.Infraestructure.Repositories
                     if (!response)
                     {
                         throw new Exception($"Error error validando usuario en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
+                    }
+
+                    return response;
+
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+        }
+
+
+        public async Task<bool> RegisterCompany(Company Company)
+        {
+            try
+            {
+                var companys = new List<Company>();
+
+                companys.Add(Company);
+                string Json = JsonConvert.SerializeObject(companys).ToString();
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Guardar_Company", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
+                    cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+
+                    await con.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    bool response = true;
+
+                    response = (bool)cmd.Parameters["@Response"].Value;
+
+                    if (!response)
+                    {
+                        throw new Exception($"Error error registrando compañia en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
                     }
 
                     return response;

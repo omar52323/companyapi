@@ -23,7 +23,7 @@ namespace Companyapi.Controllers
 
 
         [HttpPost("ValidateLogin")]
-        public async Task<IActionResult> Get([FromBody] User user)
+        public async Task<IActionResult> Get([FromBody] UserLogin user)
         {
             var res = await _companyService.ValidateLogin(user);
             return Ok(res);
@@ -34,6 +34,13 @@ namespace Companyapi.Controllers
         public async Task<IActionResult> SaveUser([FromBody] User user)
         {
             var res = await _companyService.RegisterUser(user);
+            return Ok(res);
+        }
+
+        [HttpPost("CreateCompany")]
+        public async Task<IActionResult> SaveCompany([FromBody] Company company)
+        {
+            var res = await _companyService.RegisterCompany(company);
             return Ok(res);
         }
 
