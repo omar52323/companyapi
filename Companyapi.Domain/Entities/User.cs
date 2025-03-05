@@ -14,6 +14,8 @@ namespace Companyapi.Domain.Entities
         public string? Password { get; set; }
 
         public string Cellphone { get; set; }
+
+        public List<Company>? Company { get; set; }
     }
 
     public class UserLogin

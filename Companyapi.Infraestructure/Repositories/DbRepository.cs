@@ -36,7 +36,7 @@ namespace Companyapi.Infraestructure.Repositories
                     cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
                     cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
                     cmd.Parameters.Add(new SqlParameter("@UserJson", SqlDbType.NVarChar, -1) { Direction = ParameterDirection.Output });
-
+                    cmd.Parameters.Add(new SqlParameter("@Company", SqlDbType.NVarChar, -1) { Direction = ParameterDirection.Output });
                     await con.OpenAsync();
                     await cmd.ExecuteNonQueryAsync();
 
@@ -48,7 +48,15 @@ namespace Companyapi.Infraestructure.Repositories
                     }
 
                     string userJson = cmd.Parameters["@UserJson"].Value.ToString();
+                    string CompanyJson = cmd.Parameters["@Company"].Value.ToString();
                     var validatedUser = JsonConvert.DeserializeObject<User>(userJson);
+
+                    if (CompanyJson != "")
+                    {
+                        var Company = JsonConvert.DeserializeObject<Company>(CompanyJson);
+                        validatedUser.Company = new List<Company>();
+                        validatedUser.Company.Add(Company);
+                    }
 
                     return validatedUser;
                 }
