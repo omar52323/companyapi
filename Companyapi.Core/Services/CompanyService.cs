@@ -32,5 +32,22 @@ namespace Companyapi.Core.Services
             return await _dbRepository.RegisterCompany(company);
         }
 
+        public async Task<bool> RegisterBrand(Brand brand)
+        {
+            return await _dbRepository.RegisterBrand(brand);
+        }
+        public async Task<List<Brand>> GetBrands(string Id_GUID)
+        {
+            return await _dbRepository.GetBrands(Id_GUID);
+        }
+        public async Task<bool> SaveProduct(Product product)
+        {
+            return await _dbRepository.SaveProduct(product);
+        }
+
+        public async Task<List<Product>> GetProducts(string Id_GUID)
+        {
+            return await _dbRepository.GetProducts(Id_GUID);
+        }
     }
 }

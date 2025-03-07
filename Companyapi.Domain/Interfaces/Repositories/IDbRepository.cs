@@ -12,5 +12,9 @@ namespace Companyapi.Domain.Interfaces.Repositories
         Task<User> ValidateLogin(UserLogin user);
         Task<bool> RegisterUser(User user);
         Task<Company> RegisterCompany(Company Company);
+        Task<bool> RegisterBrand(Brand brand);
+        Task<List<Brand>> GetBrands(string Id_GUID);
+        Task<bool> SaveProduct(Product product);
+        Task<List<Product>> GetProducts(string Id_GUID);
     }
 }

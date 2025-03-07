@@ -10,9 +10,11 @@ namespace Companyapi.Domain.Interfaces.Services
     public interface ICompanyService
     {
         Task<User> ValidateLogin(UserLogin user);
-
         Task<bool> RegisterUser(User user);
-
         Task<Company> RegisterCompany(Company company);
+        Task<bool> RegisterBrand(Brand brand);
+        Task<List<Brand>> GetBrands(string Id_GUID);
+        Task<List<Product>> GetProducts(string Id_GUID);
+        Task<bool> SaveProduct(Product product);
     }
 }

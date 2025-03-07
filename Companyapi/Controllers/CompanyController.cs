@@ -44,6 +44,36 @@ namespace Companyapi.Controllers
             return Ok(res);
         }
 
+        [HttpPost("CreateBrand")]
+        public async Task<IActionResult> SaveBrand([FromBody] Brand brand)
+        {
+            var res = await _companyService.RegisterBrand(brand);
+            return Ok(res);
+        }
+
+        [HttpGet("GetBrands/{Id_GUID}")]
+        public async Task<IActionResult> GetBrands( string Id_GUID)
+        {
+            var res = await _companyService.GetBrands(Id_GUID);
+            return Ok(res);
+        }
+
+        [HttpPost("CreateProduct")]
+        public async Task<IActionResult> SaveProduct([FromBody] Product product)
+        {
+            var res = await _companyService.SaveProduct(product);
+            return Ok(res);
+        }
+
+        [HttpGet("GetProducts/{Id_GUID}")]
+        public async Task<IActionResult> GetProducts(string Id_GUID)
+        {
+            var res = await _companyService.GetProducts(Id_GUID);
+            return Ok(res);
+        }
+
+
+
 
     }
 }
