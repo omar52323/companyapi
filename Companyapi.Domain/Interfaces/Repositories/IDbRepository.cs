@@ -16,5 +16,11 @@ namespace Companyapi.Domain.Interfaces.Repositories
         Task<List<Brand>> GetBrands(string Id_GUID);
         Task<bool> SaveProduct(Product product);
         Task<List<Product>> GetProducts(string Id_GUID);
+        Task<List<Product>> GetProductsByBrand(string Id_GUID, string Id_Brand);
+        Task<List<Order>> GetPendingOrders(string Id_GUID, string Id_Brand);
+        Task<List<Order>> GetReadyOrders(string Id_GUID, string Id_Brand);
+        Task<bool> SaveOrder(Order order);
+        Task<bool> ChangeProductByBrand(ProductByBrand productByBrand);
+        Task<bool> ChangeOrder(Order order);
     }
 }

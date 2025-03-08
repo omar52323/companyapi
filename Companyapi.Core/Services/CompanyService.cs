@@ -49,5 +49,34 @@ namespace Companyapi.Core.Services
         {
             return await _dbRepository.GetProducts(Id_GUID);
         }
+        public async Task<List<Product>> GetProductsByBrand(string Id_GUID,string Id_Product)
+        {
+            return await _dbRepository.GetProductsByBrand(Id_GUID, Id_Product);
+        }
+
+        public async Task<bool> SaveOrder(Order order)
+        {
+            return await _dbRepository.SaveOrder(order);
+        }
+
+        public async Task<List<Order>> GetPendingOrders(string Id_GUID, string Id_Brand)
+        {
+            return await _dbRepository.GetPendingOrders(Id_GUID,Id_Brand);
+        }
+
+        public async Task<List<Order>> GetReadyOrders(string Id_GUID, string Id_Brand)
+        {
+            return await _dbRepository.GetReadyOrders(Id_GUID,Id_Brand);
+        }
+
+        public async Task<bool> ChangeOrder(Order order)
+        {
+            return await _dbRepository.ChangeOrder(order);
+        }
+        public async Task<bool> ChangeProductByBrand(ProductByBrand productByBrand)
+        {
+            return await _dbRepository.ChangeProductByBrand(productByBrand);
+        }
+
     }
 }

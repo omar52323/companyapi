@@ -72,7 +72,47 @@ namespace Companyapi.Controllers
             return Ok(res);
         }
 
+        [HttpGet("GetProducts/{Id_GUID}/{Id_Brand}")]
+        public async Task<IActionResult> GetProductsByBrand(string Id_GUID,string Id_Brand)
+        {
+            var res = await _companyService.GetProductsByBrand(Id_GUID, Id_Brand);
+            return Ok(res);
+        }
 
+        [HttpPost("SaveOrder")]
+        public async Task<IActionResult> SaveOrder([FromBody] Order order)
+        {
+            var res = await _companyService.SaveOrder(order);
+            return Ok(res);
+        }
+
+        [HttpGet("GetPendingOrders/{Id_GUID}/{Id_Brand}")]
+        public async Task<IActionResult> GetPendingOrders(string Id_GUID,string Id_Brand)
+        {
+            var res = await _companyService.GetPendingOrders(Id_GUID,Id_Brand);
+            return Ok(res);
+        }
+
+        [HttpGet("GetReadyOrders/{Id_GUID}/{Id_Brand}")]
+        public async Task<IActionResult> GetReadyOrders(string Id_GUID, string Id_Brand)
+        {
+            var res = await _companyService.GetReadyOrders(Id_GUID, Id_Brand);
+            return Ok(res);
+        }
+
+        [HttpPost("ChangeOrder")]
+        public async Task<IActionResult> ChangeOrder([FromBody] Order order)
+        {
+            var res = await _companyService.ChangeOrder(order);
+            return Ok(res);
+        }
+
+        [HttpPost("ChangeProductByBrand")]
+        public async Task<IActionResult> ChangeProductByBrand([FromBody] ProductByBrand productbrand)
+        {
+            var res = await _companyService.ChangeProductByBrand(productbrand);
+            return Ok(res);
+        }
 
 
     }

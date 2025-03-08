@@ -360,5 +360,298 @@ namespace Companyapi.Infraestructure.Repositories
         }
 
 
+        public async Task<List<Product>> GetProductsByBrand(string Id_GUID,string Id_Brand)
+        {
+            try
+            {
+                var products = new List<Product>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Productos_In_Brand", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
+                    cmd.Parameters.Add("@Id_Brand", SqlDbType.NVarChar, -1).Value = Id_Brand;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var producto = new Product
+                            {
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : 0,
+                                Name = reader["Name"]?.ToString() ?? string.Empty,
+                                Description = reader["Description"]?.ToString() ?? string.Empty,
+                                Price = reader["Price"] != DBNull.Value ? Convert.ToSingle(reader["Price"]) : 0,
+                                Status = reader["Status"] != DBNull.Value ? Convert.ToInt32(reader["Status"]) : 0,
+
+                            };
+                            products.Add(producto);
+                        }
+                    }
+                }
+                return products;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<bool> SaveOrder(Order order)
+        {
+            try
+            {
+                string Json = JsonConvert.SerializeObject(order).ToString();
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Guardar_Orden", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
+                    cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+                    await con.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    bool response = true;
+
+                    response = (bool)cmd.Parameters["@Response"].Value;
+
+                    if (!response)
+                    {
+                        throw new Exception($"Error error Guardando orden en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
+                    }
+                    return response;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public async Task<List<Order>> GetPendingOrders(string Id_GUID, string Id_Brand)
+        {
+            try
+            {
+                var orders = new List<Order>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Ordenes_Pendientes", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
+                    cmd.Parameters.Add("@Id_Brand", SqlDbType.NVarChar, -1).Value = Id_Brand;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var order = new Order
+                            {
+                                Id = reader["Id"] as int?,
+                                BranchId = reader["BranchId"].ToString(),
+                                CustomerName = reader["CustomerName"].ToString(),
+                                CustomerPhone = reader["CustomerPhone"].ToString(),
+                                CustomerEmail = reader["CustomerEmail"].ToString(),
+                                Total = reader["Total"] != DBNull.Value ? Convert.ToSingle(reader["Total"]) : 0,
+                                Status = (int)reader["Status"],
+                                Id_GUID = reader["Id_GUID"].ToString(),
+                                FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty,
+                                CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty
+                            };
+                            order.OrderItems = await GetItemsOrders(order.Id.Value);
+                            orders.Add(order);
+                        }
+                    }
+                }
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<List<Order>> GetReadyOrders(string Id_GUID, string Id_Brand)
+        {
+            try
+            {
+                var orders = new List<Order>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Ordenes_Listas", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
+                    cmd.Parameters.Add("@Id_Brand", SqlDbType.NVarChar, -1).Value = Id_Brand;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var order = new Order
+                            {
+                                Id = reader["Id"] as int?,
+                                BranchId = reader["BranchId"].ToString(),
+                                CustomerName = reader["CustomerName"].ToString(),
+                                CustomerPhone = reader["CustomerPhone"].ToString(),
+                                CustomerEmail = reader["CustomerEmail"].ToString(),
+                                Total = reader["Total"] != DBNull.Value ? Convert.ToSingle(reader["Total"]) : 0,
+                                Status = (int)reader["Status"],
+                                Id_GUID = reader["Id_GUID"].ToString(),
+                                FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty,
+                                CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty
+                            };
+
+                            order.OrderItems = await GetItemsOrders(order.Id.Value);
+                            orders.Add(order);
+                        }
+                    }
+                }
+                return orders;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<List<OrderItem>> GetItemsOrders(int Id_Order)
+        {
+            try
+            {
+                var items = new List<OrderItem>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Items_Ordenes", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_Order", SqlDbType.Int, -1).Value = Id_Order;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+
+                            var item = new OrderItem
+                            {
+                                ProductId = (int)reader["ProductId"],
+                                Quantity = (int)reader["Quantity"],
+                                Price = (float)(double)reader["Price"],
+                                OrderId = reader["OrderId"] as int?,
+                                Id_GUID = reader["Id_GUID"].ToString(),
+                                AditionalNotes = reader["AditionalNotes"].ToString(),
+                                Name = reader["Name"].ToString(),
+                                Description = reader["Description"].ToString()
+                            };
+                            items.Add(item);
+                        }
+                    }
+                }
+                return items;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+        public async Task<bool> ChangeOrder(Order order)
+        {
+            try
+            {
+                string Json = JsonConvert.SerializeObject(order).ToString();
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Actualizar_Orden", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
+                    cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+                    await con.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    bool response = true;
+
+                    response = (bool)cmd.Parameters["@Response"].Value;
+
+                    if (!response)
+                    {
+                        throw new Exception($"Error error Guardando Actualizacion de orden en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
+                    }
+                    return response;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+        public async Task<bool> ChangeProductByBrand(ProductByBrand productByBrand)
+        {
+            try
+            {
+                string Json = JsonConvert.SerializeObject(productByBrand).ToString();
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Actualizar_Producto_Brand", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Json", SqlDbType.NVarChar, -1).Value = Json;
+                    cmd.Parameters.Add(new SqlParameter("@Response", SqlDbType.Bit) { Direction = ParameterDirection.Output });
+                    cmd.Parameters.Add(new SqlParameter("@Message", SqlDbType.VarChar, -1) { Direction = ParameterDirection.Output });
+                    await con.OpenAsync();
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    bool response = true;
+
+                    response = (bool)cmd.Parameters["@Response"].Value;
+
+                    if (!response)
+                    {
+                        throw new Exception($"Error error Guardando Actualizacion de producto por marca en la base de datos de sql server, detail: {cmd.Parameters["@Message"].Value.ToString()}");
+                    }
+                    return response;
+
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
     }
 }

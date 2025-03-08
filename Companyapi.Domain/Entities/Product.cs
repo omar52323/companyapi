@@ -16,4 +16,13 @@ namespace Companyapi.Domain.Entities
         public List<Brand> StatusBrands { get; set; }
         public string Id_GUID { get; set; }
     }
+
+    public class ProductByBrand
+    {
+        public int Id_Product { get; set; }
+        public int Id_Brand { get; set; }
+        public int Status { get; set; }
+        public string Id_GUID { get; set; }
+
+    }
 }
