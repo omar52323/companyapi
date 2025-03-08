@@ -25,5 +25,7 @@ namespace Companyapi.Domain.Interfaces.Services
         Task<List<BranchSales>> GetSales(SalesFilter salesFilter);
         Task<List<Stats>> GetDaily(string Id_GUID);
         Task<List<Order>> GetRecentOrders(string Id_GUID);
+        Task<bool> ChangePassword(User user);
+        Task<User> GetUserInfo(string Id_User);
     }
 }

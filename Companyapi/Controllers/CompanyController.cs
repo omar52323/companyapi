@@ -135,6 +135,20 @@ namespace Companyapi.Controllers
             return Ok(res);
         }
 
+        [HttpGet("GetUserInfo/{Id_User}")]
+        public async Task<IActionResult> GetUserInfo(string Id_User)
+        {
+            var res = await _companyService.GetUserInfo(Id_User);
+            return Ok(res);
+        }
+
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] User user)
+        {
+            var res = await _companyService.ChangePassword(user);
+            return Ok(res);
+        }
+
 
     }
 }

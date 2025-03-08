@@ -93,5 +93,15 @@ namespace Companyapi.Core.Services
             return await _dbRepository.GetRecentOrders(Id_GUID);
         }
 
+        public async Task<User> GetUserInfo(string Id_User)
+        {
+            return await _dbRepository.GetUserInfo(Id_User);
+        }
+
+        public async Task<bool> ChangePassword(User user)
+        {
+            return await _dbRepository.ChangePassword(user);
+        }
+
     }
 }
