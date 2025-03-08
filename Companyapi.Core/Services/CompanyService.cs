@@ -78,5 +78,10 @@ namespace Companyapi.Core.Services
             return await _dbRepository.ChangeProductByBrand(productByBrand);
         }
 
+        public async Task<List<BranchSales>> GetSales(SalesFilter salesFilter)
+        {
+            return await _dbRepository.GetSales(salesFilter);
+        }
+
     }
 }

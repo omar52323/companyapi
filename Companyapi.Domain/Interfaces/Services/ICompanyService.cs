@@ -22,5 +22,6 @@ namespace Companyapi.Domain.Interfaces.Services
         Task<List<Order>> GetPendingOrders(string Id_GUID, string Id_Brand);
         Task<bool> ChangeOrder(Order order);
         Task<bool> ChangeProductByBrand(ProductByBrand productByBrand);
+        Task<List<BranchSales>> GetSales(SalesFilter salesFilter);
     }
 }

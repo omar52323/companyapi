@@ -510,7 +510,7 @@ namespace Companyapi.Infraestructure.Repositories
                         {
                             var order = new Order
                             {
-                                Id = reader["Id"] as int?,
+                                Id = reader["Id"] != DBNull.Value ? Convert.ToInt32(reader["Id"]) : (int?)null,
                                 BranchId = reader["BranchId"].ToString(),
                                 CustomerName = reader["CustomerName"].ToString(),
                                 CustomerPhone = reader["CustomerPhone"].ToString(),
@@ -652,6 +652,94 @@ namespace Companyapi.Infraestructure.Repositories
                 throw;
             }
         }
+
+        public async Task<List<BranchSales>> GetSales(SalesFilter salesFilter)
+        {
+            try
+            {
+                var sales = new List<BranchSales>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Ventas_Sucursales", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Start_Date", SqlDbType.NVarChar, -1).Value = salesFilter.StartDate;
+                    cmd.Parameters.Add("@End_Date", SqlDbType.NVarChar, -1).Value = salesFilter.EndDate;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = salesFilter.Id_GUID;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var sale = new BranchSales
+                            {
+                                Id = (int)reader["Id"],
+                                Name = reader["Name"].ToString(),
+                                TotalSales = reader["TotalSales"] != DBNull.Value ? Convert.ToSingle(reader["TotalSales"]) : 0,
+                               
+                            };
+                            sale.Sales=await GetSalesBrand(sale.Id, salesFilter.StartDate,salesFilter.EndDate);
+                            sales.Add(sale);
+                        }
+                    }
+                }
+                return sales;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<List<Sale>> GetSalesBrand(int Id_Brand,string StartDate,string EndDate)
+        {
+            try
+            {
+                var sales = new List<Sale>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Ventas_Por_Sucursal", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_Brand", SqlDbType.Int, -1).Value = Id_Brand;
+                    cmd.Parameters.Add("@Start_Date", SqlDbType.NVarChar, -1).Value = StartDate;
+                    cmd.Parameters.Add("@End_Date", SqlDbType.NVarChar, -1).Value = EndDate;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var sale = new Sale
+                            {
+                                Date = reader["Date"].ToString(),
+                                ProductName = reader["ProductName"].ToString(),
+                                ProductId = (int)reader["ProductId"],
+                                Amount = reader["Amount"] != DBNull.Value ? Convert.ToSingle(reader["Amount"]) : 0
+                            };
+
+                            sales.Add(sale);
+                        }
+                    }
+                }
+                return sales;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+
 
     }
 }

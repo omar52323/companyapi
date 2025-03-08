@@ -22,5 +22,7 @@ namespace Companyapi.Domain.Interfaces.Repositories
         Task<bool> SaveOrder(Order order);
         Task<bool> ChangeProductByBrand(ProductByBrand productByBrand);
         Task<bool> ChangeOrder(Order order);
+
+        Task<List<BranchSales>> GetSales(SalesFilter salesFilter);
     }
 }

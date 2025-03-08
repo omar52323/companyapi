@@ -114,6 +114,13 @@ namespace Companyapi.Controllers
             return Ok(res);
         }
 
+        [HttpPost("GetSales")]
+        public async Task<IActionResult> GetSales([FromBody] SalesFilter salesFilter)
+        {
+            var res = await _companyService.GetSales(salesFilter);
+            return Ok(res);
+        }
+
 
     }
 }
