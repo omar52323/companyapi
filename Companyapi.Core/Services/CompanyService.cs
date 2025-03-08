@@ -83,5 +83,15 @@ namespace Companyapi.Core.Services
             return await _dbRepository.GetSales(salesFilter);
         }
 
+        public async Task<List<Stats>> GetDaily(string Id_GUID)
+        {
+            return await _dbRepository.GetDaily(Id_GUID);
+        }
+
+        public async Task<List<Order>> GetRecentOrders(string Id_GUID)
+        {
+            return await _dbRepository.GetRecentOrders(Id_GUID);
+        }
+
     }
 }

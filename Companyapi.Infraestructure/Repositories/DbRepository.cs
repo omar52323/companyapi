@@ -682,7 +682,7 @@ namespace Companyapi.Infraestructure.Repositories
                                 TotalSales = reader["TotalSales"] != DBNull.Value ? Convert.ToSingle(reader["TotalSales"]) : 0,
                                
                             };
-                            sale.Sales=await GetSalesBrand(sale.Id, salesFilter.StartDate,salesFilter.EndDate);
+                            sale.Sales=await GetSalesBrand(sale.Id, salesFilter.StartDate,salesFilter.EndDate, salesFilter.Id_GUID);
                             sales.Add(sale);
                         }
                     }
@@ -696,7 +696,7 @@ namespace Companyapi.Infraestructure.Repositories
         }
 
 
-        public async Task<List<Sale>> GetSalesBrand(int Id_Brand,string StartDate,string EndDate)
+        public async Task<List<Sale>> GetSalesBrand(int Id_Brand,string StartDate,string EndDate,string Id_GUID)
         {
             try
             {
@@ -712,6 +712,7 @@ namespace Companyapi.Infraestructure.Repositories
                     cmd.Parameters.Add("@Id_Brand", SqlDbType.Int, -1).Value = Id_Brand;
                     cmd.Parameters.Add("@Start_Date", SqlDbType.NVarChar, -1).Value = StartDate;
                     cmd.Parameters.Add("@End_Date", SqlDbType.NVarChar, -1).Value = EndDate;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
                     await con.OpenAsync();
 
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -731,6 +732,93 @@ namespace Companyapi.Infraestructure.Repositories
                     }
                 }
                 return sales;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<List<Stats>> GetDaily(string Id_GUID)
+        {
+            try
+            {
+                var stats = new List<Stats>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Daily_Stats", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var stat = new Stats
+                            {
+                                Id = (int)reader["Id"],
+                                Change = reader["Change"] != DBNull.Value ? Convert.ToSingle(reader["Change"]) : 0,
+                                Value = reader["Value"] != DBNull.Value ? Convert.ToInt32(reader["Value"]) : 0,
+
+                            };
+                            stats.Add(stat);
+                        }
+                    }
+                }
+                return stats;
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
+
+        public async Task<List<Order>> GetRecentOrders(string Id_GUID)
+        {
+            try
+            {
+                var orders = new List<Order>();
+
+                using (SqlConnection con = new SqlConnection(_settings.ClientConnection))
+                {
+                    SqlCommand cmd = new SqlCommand("SP_Listar_Ordenes_Recientes", con)
+                    {
+                        CommandType = CommandType.StoredProcedure
+                    };
+                    cmd.CommandTimeout = 0;
+                    cmd.Parameters.Add("@Id_GUID", SqlDbType.NVarChar, -1).Value = Id_GUID;
+                    await con.OpenAsync();
+
+                    using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var order = new Order
+                            {
+                                Id = reader["Id"] as int?,
+                                BranchId = reader["BranchId"].ToString(),
+                                BranchName = reader["BranchName"].ToString(),
+                                CustomerName = reader["CustomerName"].ToString(),
+                                CustomerPhone = reader["CustomerPhone"].ToString(),
+                                CustomerEmail = reader["CustomerEmail"].ToString(),
+                                Total = reader["Total"] != DBNull.Value ? Convert.ToSingle(reader["Total"]) : 0,
+                                Status = (int)reader["Status"],
+                                Id_GUID = reader["Id_GUID"].ToString(),
+                                FechaEntrega = reader["FechaEntrega"] != DBNull.Value ? Convert.ToDateTime(reader["FechaEntrega"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty,
+                                CreatedAt = reader["CreatedAt"] != DBNull.Value ? Convert.ToDateTime(reader["CreatedAt"]).ToString("yyyy-MM-dd HH:mm:ss") : string.Empty
+                            };
+                            orders.Add(order);
+                        }
+                    }
+                }
+                return orders;
             }
             catch (Exception ex)
             {

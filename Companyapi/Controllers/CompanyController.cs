@@ -121,6 +121,20 @@ namespace Companyapi.Controllers
             return Ok(res);
         }
 
+        [HttpGet("GetStats/{Id_GUID}")]
+        public async Task<IActionResult> GetDaily(string Id_GUID)
+        {
+            var res = await _companyService.GetDaily(Id_GUID);
+            return Ok(res);
+        }
+
+        [HttpGet("GetRecentOrders/{Id_GUID}")]
+        public async Task<IActionResult>GetRecentOrders(string Id_GUID)
+        {
+            var res = await _companyService.GetRecentOrders(Id_GUID);
+            return Ok(res);
+        }
+
 
     }
 }

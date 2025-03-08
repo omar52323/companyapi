@@ -23,5 +23,7 @@ namespace Companyapi.Domain.Interfaces.Services
         Task<bool> ChangeOrder(Order order);
         Task<bool> ChangeProductByBrand(ProductByBrand productByBrand);
         Task<List<BranchSales>> GetSales(SalesFilter salesFilter);
+        Task<List<Stats>> GetDaily(string Id_GUID);
+        Task<List<Order>> GetRecentOrders(string Id_GUID);
     }
 }
